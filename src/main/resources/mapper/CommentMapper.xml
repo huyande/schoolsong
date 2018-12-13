@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.song.dao.CommentMapper" >
+
+    <resultMap id="BaseResultMap" type="com.song.bean.Comment" >
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="openid" property="openid" jdbcType="VARCHAR" />
+        <result column="comment" property="comment" jdbcType="VARCHAR" />
+        <result column="score" property="score" jdbcType="INTEGER" />
+        <result column="songid" property="songid" jdbcType="VARCHAR" />
+        <result column="createtime" property="createtime" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        id, openid, comment, score, songid, createtime
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select 
+        <include refid="Base_Column_List" />
+        from comment
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+    
+    <select id="findcommentBySongid" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select 
+        <include refid="Base_Column_List" />
+        from comment
+        where songid = #{songid,jdbcType=VARCHAR}
+    </select>
+    
+    <select id="findCommentList" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+        select 
+        <include refid="Base_Column_List" />
+        from comment ORDER BY createtime DESC limit #{pageStart},#{pageSize}
+    </select>
+    
+    <select id="totalContComment" resultType="java.lang.Integer"  >
+        select count(1) from comment 
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+        delete from comment
+        where id = #{id,jdbcType=VARCHAR}
+    </delete>
+
+    <insert id="insert" parameterType="com.song.bean.Comment" >
+     	<selectKey  keyProperty="id" resultType="java.lang.String" order="BEFORE">
+	             select uuid()
+	 	</selectKey>
+        insert into comment (id, openid, comment, 
+            score, songid
+            )
+        values (#{id,jdbcType=VARCHAR}, #{openid,jdbcType=VARCHAR}, #{comment,jdbcType=VARBINARY}, 
+            #{score,jdbcType=INTEGER}, #{songid,jdbcType=VARCHAR}
+            )
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.song.bean.Comment" >
+        insert into comment
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                id,
+            </if>
+            <if test="openid != null" >
+                openid,
+            </if>
+            <if test="comment != null" >
+                comment,
+            </if>
+            <if test="score != null" >
+                score,
+            </if>
+            <if test="songid != null" >
+                songid,
+            </if>
+            <if test="createtime != null" >
+                createtime,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="openid != null" >
+                #{openid,jdbcType=VARCHAR},
+            </if>
+            <if test="comment != null" >
+                #{comment,jdbcType=VARBINARY},
+            </if>
+            <if test="score != null" >
+                #{score,jdbcType=INTEGER},
+            </if>
+            <if test="songid != null" >
+                #{songid,jdbcType=VARCHAR},
+            </if>
+            <if test="createtime != null" >
+                #{createtime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.song.bean.Comment" >
+        update comment
+        <set >
+            <if test="openid != null" >
+                openid = #{openid,jdbcType=VARCHAR},
+            </if>
+            <if test="comment != null" >
+                comment = #{comment,jdbcType=VARBINARY},
+            </if>
+            <if test="score != null" >
+                score = #{score,jdbcType=INTEGER},
+            </if>
+            <if test="songid != null" >
+                songid = #{songid,jdbcType=VARCHAR},
+            </if>
+            <if test="createtime != null" >
+                createtime = #{createtime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.song.bean.Comment" >
+        update comment
+        set openid = #{openid,jdbcType=VARCHAR},
+            comment = #{comment,jdbcType=VARBINARY},
+            score = #{score,jdbcType=INTEGER},
+            songid = #{songid,jdbcType=VARCHAR},
+            createtime = #{createtime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+</mapper>

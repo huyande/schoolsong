@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.song.dao.SongMapper" >
+
+    <resultMap id="BaseResultMap" type="com.song.bean.Song" >
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="openid" property="openid" jdbcType="VARCHAR" />
+        <result column="songname" property="songname" jdbcType="VARCHAR" />
+        <result column="songer" property="songer" jdbcType="VARCHAR" />
+        <result column="message" property="message" jdbcType="VARCHAR" />
+        <result column="stateplay" property="stateplay" jdbcType="INTEGER" />
+        <result column="feedbackmessage" property="feedbackmessage" jdbcType="VARCHAR" />
+        <result column="createtime" property="createtime" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        id, openid, songname, songer, message, stateplay, feedbackmessage, createtime
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select 
+        <include refid="Base_Column_List" />
+        from song
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+    <!--根据 openid 查询此用户点播的所有  -->
+    <select id="findSongByOpendId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select 
+        <include refid="Base_Column_List" />
+        from song
+        where openid = #{openid,jdbcType=VARCHAR}
+    </select>
+    
+    <!--分页查  -->
+    <select id="findbyOpenidList" resultMap="BaseResultMap" >
+        select 
+        <include refid="Base_Column_List" />
+        from song
+        where openid = #{openid,jdbcType=VARCHAR} and 
+        <if test="handleState ==0">
+        	stateplay = 0
+        </if>
+        <if test="handleState ==1">
+        	stateplay in(1,-1)
+        </if>
+        ORDER BY createtime DESC limit #{pageStart},#{pageSize}
+    </select>
+    
+    <!--分页查  -->
+    <select id="findSongList" resultMap="BaseResultMap" >
+        select 
+        <include refid="Base_Column_List" />
+        from song ORDER BY createtime DESC limit #{pageStart},#{pageSize}
+    </select>
+    
+    <!--分页查  -->
+    <select id="findbyOpenidMessageList" resultMap="BaseResultMap"  parameterType="java.lang.String">
+        select 
+        <include refid="Base_Column_List" />
+        from song where openid= #{openid,jdbcType=VARCHAR} ORDER BY createtime DESC 
+    </select>
+    
+    <!--查总数 -->
+    <select id="totalSong" resultType="java.lang.Integer"  >
+        SELECT COUNT(1) FROM  song 
+    </select>
+    
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+        delete from song
+        where id = #{id,jdbcType=VARCHAR}
+    </delete>
+
+    <insert id="insert" parameterType="com.song.bean.Song" >
+   		 <selectKey  keyProperty="id" resultType="java.lang.String" order="BEFORE">
+	             select uuid()
+	 	</selectKey>
+        insert into song (id, openid, songname, 
+            songer, message,
+            feedbackmessage)
+        values (#{id,jdbcType=VARCHAR}, #{openid,jdbcType=VARCHAR}, #{songname,jdbcType=VARCHAR}, 
+            #{songer,jdbcType=VARCHAR}, #{message,jdbcType=VARCHAR},
+            #{feedbackmessage,jdbcType=VARCHAR})
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.song.bean.Song" >
+        insert into song
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                id,
+            </if>
+            <if test="openid != null" >
+                openid,
+            </if>
+            <if test="songname != null" >
+                songname,
+            </if>
+            <if test="songer != null" >
+                songer,
+            </if>
+            <if test="message != null" >
+                message,
+            </if>
+            <if test="stateplay != null" >
+                stateplay,
+            </if>
+            <if test="feedbackmessage != null" >
+                feedbackmessage,
+            </if>
+            <if test="createtime != null" >
+                createtime,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="openid != null" >
+                #{openid,jdbcType=VARCHAR},
+            </if>
+            <if test="songname != null" >
+                #{songname,jdbcType=VARCHAR},
+            </if>
+            <if test="songer != null" >
+                #{songer,jdbcType=VARCHAR},
+            </if>
+            <if test="message != null" >
+                #{message,jdbcType=VARCHAR},
+            </if>
+            <if test="stateplay != null" >
+                #{stateplay,jdbcType=INTEGER},
+            </if>
+            <if test="feedbackmessage != null" >
+                #{feedbackmessage,jdbcType=VARCHAR},
+            </if>
+            <if test="createtime != null" >
+                #{createtime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.song.bean.Song" >
+        update song
+        <set >
+            <if test="openid != null" >
+                openid = #{openid,jdbcType=VARCHAR},
+            </if>
+            <if test="songname != null" >
+                songname = #{songname,jdbcType=VARCHAR},
+            </if>
+            <if test="songer != null" >
+                songer = #{songer,jdbcType=VARCHAR},
+            </if>
+            <if test="message != null" >
+                message = #{message,jdbcType=VARCHAR},
+            </if>
+            <if test="stateplay != null" >
+                stateplay = #{stateplay,jdbcType=INTEGER},
+            </if>
+            <if test="feedbackmessage != null" >
+                feedbackmessage = #{feedbackmessage,jdbcType=VARCHAR},
+            </if>
+            <if test="createtime != null" >
+                createtime = #{createtime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.song.bean.Song" >
+        update song
+        set openid = #{openid,jdbcType=VARCHAR},
+            songname = #{songname,jdbcType=VARCHAR},
+            songer = #{songer,jdbcType=VARCHAR},
+            message = #{message,jdbcType=VARCHAR},
+            stateplay = #{stateplay,jdbcType=INTEGER},
+            feedbackmessage = #{feedbackmessage,jdbcType=VARCHAR},
+            createtime = #{createtime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+</mapper>
